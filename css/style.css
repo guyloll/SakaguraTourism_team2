@@ -40,6 +40,18 @@
   box-sizing: border-box;
 }
 
+html {
+  /* ブラウザ既定の太いスクロールバーを非表示にする（Firefox） */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* ブラウザ既定の太いスクロールバーを非表示にする（Chrome・Edge・Safari）。
+   スクロール自体はマウスホイール・タッチ・キー操作でそのまま可能 */
+html::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -931,6 +943,37 @@ h1, h2, p {
 
 .type-card {
   text-align: center;
+}
+
+/* キャラクター画像・タイプ通称・タイプ名（＝カードの中身全体）が、左列は左から、右列は右からフェードインする */
+.type-card.fade-in-left,
+.type-card.fade-in-right {
+  opacity: 0;
+  /* フェードインの速度を通常より20%遅く（0.6s → 0.72s） */
+  transition: opacity 0.72s ease, transform 0.72s ease;
+}
+
+.type-card.fade-in-left {
+  transform: translateX(-16px);
+}
+
+.type-card.fade-in-right {
+  transform: translateX(16px);
+}
+
+.type-card.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 動きを抑えたい設定を優先するユーザーには、アニメーションさせず最初から表示する */
+@media (prefers-reduced-motion: reduce) {
+  .type-card.fade-in-left,
+  .type-card.fade-in-right {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 .type-card-image-button {

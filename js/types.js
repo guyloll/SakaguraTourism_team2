@@ -12,6 +12,7 @@ function initTypesPage() {
   cacheTypesElements();
   renderTypesGrid();
   setupModalCloseHandlers();
+  setupCardFadeInObserver();
 }
 
 // 操作・描画に必要なDOM要素をまとめて取得する
@@ -38,18 +39,19 @@ function cacheTypesElements() {
 function renderTypesGrid() {
   const typeCodes = Object.keys(personalityTypes);
 
-  typeCodes.forEach((typeCode) => {
-    const card = createTypeCardElement(typeCode);
+  typeCodes.forEach((typeCode, index) => {
+    const card = createTypeCardElement(typeCode, index);
     typesElements.grid.appendChild(card);
   });
 }
 
 // 1タイプ分のカード（画像・通称・タイプ名）のDOM要素を作成する
-function createTypeCardElement(typeCode) {
+// index（並び順）の偶数・奇数で、フェードインする方向（左列＝左から／右列＝右から）を分ける
+function createTypeCardElement(typeCode, index) {
   const personality = personalityTypes[typeCode];
 
   const card = document.createElement("div");
-  card.className = "type-card";
+  card.className = "type-card " + (index % 2 === 0 ? "fade-in-left" : "fade-in-right");
 
   const imageButton = document.createElement("button");
   imageButton.type = "button";
@@ -77,6 +79,40 @@ function createTypeCardElement(typeCode) {
   card.appendChild(code);
 
   return card;
+}
+
+// カードが画面内に入ったタイミングで、左右からのフェードインを発火させる。
+// タブに遷移した直後は最初の数枚がまとめて画面内に入るため、そのときは上から順に少しずつ
+// 遅らせて連続表示にする（スクロールで後から画面内に入るカードも、同じ仕組みでフェードインする）
+function setupCardFadeInObserver() {
+  const cards = typesElements.grid.querySelectorAll(".type-card");
+
+  // Intersection Observer未対応環境や動きを抑えたい設定のユーザーには、最初から全部表示する
+  if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    cards.forEach((card) => card.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries, observerInstance) => {
+      // 1回のコールバックでまとめて画面内に入ったカード同士だけ、その中の順番で少しずつ遅らせる
+      // （スクロールに応じて後から画面内に入るカードまで大きな遅延を持ち越さないようにするため）
+      const enteringCards = entries
+        .filter((entry) => entry.isIntersecting)
+        .map((entry) => entry.target)
+        .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+
+      enteringCards.forEach((card, indexInBatch) => {
+        card.style.transitionDelay = indexInBatch * 150 + "ms";
+        card.classList.add("is-visible");
+        // 一度表示したカードは監視を止める（スクロールで往復しても再アニメーションしない）
+        observerInstance.unobserve(card);
+      });
+    },
+    { threshold: 0.2, rootMargin: "0px 0px -40px 0px" }
+  );
+
+  cards.forEach((card) => observer.observe(card));
 }
 
 // ------------------------------------------------------------
