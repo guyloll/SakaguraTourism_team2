@@ -47,9 +47,11 @@
     <!-- 診断結果の表示エリア -->
     <div id="resultContainer" class="card result-container" hidden>
 
-      <p class="type-code" id="typeCodeText"></p>
-      <img id="typeImage" class="type-image" alt="">
-      <h1 id="typeNameText" class="type-name"></h1>
+      <div id="resultHero" class="result-hero">
+        <p class="type-code" id="typeCodeText"></p>
+        <img id="typeImage" class="type-image" alt="">
+        <h1 id="typeNameText" class="type-name"></h1>
+      </div>
 
       <!-- 4軸それぞれのスコアを％表示するエリア（中身はresult.jsがscoresデータから動的に生成する） -->
       <section id="axisSection" class="result-section axis-section" hidden>
@@ -59,17 +61,17 @@
 
       <!-- PC幅では2列に並ぶ情報グリッド（性格・食事の傾向・好む食べ物・おすすめの日本酒） -->
       <div class="result-info-grid">
-        <section class="result-section">
+        <section class="result-section reveal-slide slide-in-left">
           <h2><budoux-ja>性格</budoux-ja></h2>
           <p id="descriptionText"></p>
         </section>
 
-        <section class="result-section">
+        <section class="result-section reveal-slide slide-in-right">
           <h2><budoux-ja>食事の傾向</budoux-ja></h2>
           <p id="dietDescriptionText"></p>
         </section>
 
-        <section class="result-section foods-section">
+        <section class="result-section foods-section reveal-slide slide-in-left">
           <h2><budoux-ja>好む食べ物</budoux-ja></h2>
           <ul id="favoriteFoodsList" class="foods-list"></ul>
         </section>
@@ -81,33 +83,35 @@
         </section>
       </div>
 
-      <!-- SNSシェア画像の生成エリア：Canvas APIでシェア用画像を作り、ワンタップでOSの共有画面からSNSへシェアする -->
-      <section class="result-section share-section">
-        <h2><budoux-ja>この結果をシェアする</budoux-ja></h2>
-        <p class="share-description"><budoux-ja>ワンタップでInstagramやXにシェアしよう！</budoux-ja></p>
+      <div id="resultFooterActions" class="result-footer-actions">
+        <!-- SNSシェア画像の生成エリア：Canvas APIでシェア用画像を作り、ワンタップでOSの共有画面からSNSへシェアする -->
+        <section class="result-section share-section">
+          <h2><budoux-ja>この結果をシェアする</budoux-ja></h2>
+          <p class="share-description"><budoux-ja>ワンタップでInstagramやXにシェアしよう！</budoux-ja></p>
 
-        <div class="share-buttons">
-          <button type="button" id="shareOnInstagramButton" class="share-button share-button-instagram">
-            <budoux-ja>Instagramでシェア</budoux-ja>
-          </button>
-          <button type="button" id="shareOnXButton" class="share-button share-button-x">
-            <budoux-ja>Xでシェア</budoux-ja>
-          </button>
+          <div class="share-buttons">
+            <button type="button" id="shareOnInstagramButton" class="share-button share-button-instagram">
+              <budoux-ja>Instagramでシェア</budoux-ja>
+            </button>
+            <button type="button" id="shareOnXButton" class="share-button share-button-x">
+              <budoux-ja>Xでシェア</budoux-ja>
+            </button>
+          </div>
+
+          <!-- ワンタップシェア（Web Share API）に対応していない環境向けの代替表示：画像プレビュー＋保存ボタン -->
+          <div id="sharePreviewArea" class="share-preview-area" hidden>
+            <p id="sharePreviewCaption" class="share-preview-caption"></p>
+            <canvas id="shareCanvas" class="share-canvas"></canvas>
+            <p class="share-fallback-note"><budoux-ja>お使いのブラウザは直接シェアに対応していないため、画像を保存してSNSアプリから投稿してください。</budoux-ja></p>
+            <button type="button" id="downloadShareImageButton" class="primary-button download-button">
+              <budoux-ja>画像を保存する</budoux-ja>
+            </button>
+          </div>
+        </section>
+
+        <div class="restart-area">
+          <a href="index.html" id="restartLink" class="primary-button"><budoux-ja>もう一度診断する</budoux-ja></a>
         </div>
-
-        <!-- ワンタップシェア（Web Share API）に対応していない環境向けの代替表示：画像プレビュー＋保存ボタン -->
-        <div id="sharePreviewArea" class="share-preview-area" hidden>
-          <p id="sharePreviewCaption" class="share-preview-caption"></p>
-          <canvas id="shareCanvas" class="share-canvas"></canvas>
-          <p class="share-fallback-note"><budoux-ja>お使いのブラウザは直接シェアに対応していないため、画像を保存してSNSアプリから投稿してください。</budoux-ja></p>
-          <button type="button" id="downloadShareImageButton" class="primary-button download-button">
-            <budoux-ja>画像を保存する</budoux-ja>
-          </button>
-        </div>
-      </section>
-
-      <div class="restart-area">
-        <a href="index.html" id="restartLink" class="primary-button"><budoux-ja>もう一度診断する</budoux-ja></a>
       </div>
 
     </div>

@@ -15,6 +15,39 @@ function renderSakeRecommendations(listContainer, sakeList) {
     const item = createSakeRecommendationElement(sake, showNumber ? index + 1 : null);
     listContainer.appendChild(item);
   });
+
+  setupSakeItemFadeInObserver(listContainer);
+}
+
+// 銘柄カードが、スクロールして画面内に入ったタイミングで下からフェードインする
+function setupSakeItemFadeInObserver(listContainer) {
+  const items = listContainer.querySelectorAll(".sake-recommendation-item");
+
+  // Intersection Observer未対応環境や動きを抑えたい設定のユーザーには、最初から全部表示する
+  if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    items.forEach((item) => item.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries, observerInstance) => {
+      // 1回のコールバックでまとめて画面内に入ったカード同士だけ、その中の順番で少しずつ遅らせる
+      const enteringItems = entries
+        .filter((entry) => entry.isIntersecting)
+        .map((entry) => entry.target)
+        .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+
+      enteringItems.forEach((item, indexInBatch) => {
+        item.style.transitionDelay = indexInBatch * 150 + "ms";
+        item.classList.add("is-visible");
+        // 一度表示したカードは監視を止める（スクロールで往復しても再アニメーションしない）
+        observerInstance.unobserve(item);
+      });
+    },
+    { threshold: 0.2, rootMargin: "0px 0px -40px 0px" }
+  );
+
+  items.forEach((item) => observer.observe(item));
 }
 
 // 1件分のおすすめ日本酒カード（銘柄→酒蔵名→画像→ボタン）のDOM要素を作成する

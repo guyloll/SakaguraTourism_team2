@@ -97,13 +97,18 @@ function setupCardFadeInObserver() {
     (entries, observerInstance) => {
       // 1回のコールバックでまとめて画面内に入ったカード同士だけ、その中の順番で少しずつ遅らせる
       // （スクロールに応じて後から画面内に入るカードまで大きな遅延を持ち越さないようにするため）
+      // 上の行から順、かつ同じ行の中では左列→右列の順になるように並べ替える
       const enteringCards = entries
         .filter((entry) => entry.isIntersecting)
         .map((entry) => entry.target)
-        .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+        .sort((a, b) => {
+          const rectA = a.getBoundingClientRect();
+          const rectB = b.getBoundingClientRect();
+          return rectA.top - rectB.top || rectA.left - rectB.left;
+        });
 
       enteringCards.forEach((card, indexInBatch) => {
-        card.style.transitionDelay = indexInBatch * 150 + "ms";
+        card.style.transitionDelay = indexInBatch * 300 + "ms";
         card.classList.add("is-visible");
         // 一度表示したカードは監視を止める（スクロールで往復しても再アニメーションしない）
         observerInstance.unobserve(card);

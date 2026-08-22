@@ -574,6 +574,27 @@ h1, h2, p {
   text-align: center;
 }
 
+/* タイプ名・画像・タイプ通称のまとまりを、結果表示時にポップイン（拡大しながら弾むように表示）させる */
+.result-hero {
+  opacity: 0;
+  transform: scale(0.7);
+  /* cubic-bezierで一瞬1倍より大きく弾んでから収まる、ポップイン特有の動きにする */
+  transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.result-hero.is-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .result-hero {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 /* タイプコードは紺×金のバッジ表示にして、診断結果の「見せ場」として印象づける */
 .type-code {
   display: inline-block;
@@ -607,6 +628,33 @@ h1, h2, p {
 .result-section {
   text-align: left;
   margin-bottom: 44px;
+}
+
+/* スクロールして画面内に入ったタイミングで、左右からスライドインする（性格・食事の傾向・好む食べ物） */
+.reveal-slide {
+  opacity: 0;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.slide-in-left {
+  transform: translateX(-30px);
+}
+
+.slide-in-right {
+  transform: translateX(30px);
+}
+
+.reveal-slide.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-slide {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 .result-section h2 {
@@ -657,6 +705,23 @@ h1, h2, p {
   background-color: rgba(255, 255, 255, 0.03);
   border-radius: 0;
   padding: 18px 14px;
+  /* スクロールして画面内に入ったタイミングで、下からフェードインする */
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.sake-recommendation-item.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sake-recommendation-item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 .sake-brand {
@@ -757,6 +822,26 @@ h1, h2, p {
   display: flex;
   flex-direction: column;
   gap: 28px;
+}
+
+/* スクロールして画面内に入ったタイミングで、下から順にフェードインする */
+.axis-bar {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.axis-bar.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .axis-bar {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 .axis-bar-1 {
@@ -896,6 +981,27 @@ h1, h2, p {
 
 .restart-area {
   margin-top: 8px;
+}
+
+/* シェア欄＋もう一度診断するボタンのまとまりを、スクロールして画面内に入ったタイミングでポップアップさせる */
+.result-footer-actions {
+  opacity: 0;
+  transform: scale(0.7);
+  /* cubic-bezierで一瞬1倍より大きく弾んでから収まる、ポップイン特有の動きにする */
+  transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.result-footer-actions.is-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .result-footer-actions {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 /* ------------------------------------------------------------

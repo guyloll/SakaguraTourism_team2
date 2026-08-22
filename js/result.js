@@ -61,6 +61,8 @@ function cacheDomElements() {
   elements = {
     errorContainer: document.getElementById("errorContainer"),
     resultContainer: document.getElementById("resultContainer"),
+    resultHero: document.getElementById("resultHero"),
+    resultFooterActions: document.getElementById("resultFooterActions"),
     typeCodeText: document.getElementById("typeCodeText"),
     typeImage: document.getElementById("typeImage"),
     typeNameText: document.getElementById("typeNameText"),
@@ -183,6 +185,39 @@ function renderAxisBars(scores) {
   });
 
   elements.axisSection.hidden = false;
+
+  setupAxisBarFadeInObserver();
+}
+
+// スコアバーが画面内に入ったタイミングで、下から順にフェードインさせる
+function setupAxisBarFadeInObserver() {
+  const bars = elements.axisBars.querySelectorAll(".axis-bar");
+
+  // Intersection Observer未対応環境や動きを抑えたい設定のユーザーには、最初から全部表示する
+  if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    bars.forEach((bar) => bar.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries, observerInstance) => {
+      // 1回のコールバックでまとめて画面内に入ったバー同士だけ、その中の順番で少しずつ遅らせる
+      const enteringBars = entries
+        .filter((entry) => entry.isIntersecting)
+        .map((entry) => entry.target)
+        .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+
+      enteringBars.forEach((bar, indexInBatch) => {
+        bar.style.transitionDelay = indexInBatch * 150 + "ms";
+        bar.classList.add("is-visible");
+        // 一度表示したバーは監視を止める（スクロールで往復しても再アニメーションしない）
+        observerInstance.unobserve(bar);
+      });
+    },
+    { threshold: 0.2, rootMargin: "0px 0px -40px 0px" }
+  );
+
+  bars.forEach((bar) => observer.observe(bar));
 }
 
 // 1軸分のスコアバー（「◯％ ◯◯型」の見出し＋バー＋両端ラベル）のDOM要素を作成する
@@ -257,6 +292,88 @@ function showError() {
 function showResultContainer() {
   elements.errorContainer.hidden = true;
   elements.resultContainer.hidden = false;
+
+  playResultHeroPopIn();
+  setupSlideInObserver();
+  setupFooterActionsPopInObserver();
+}
+
+// シェア欄＋もう一度診断するボタンが、スクロールして画面内に入ったタイミングでポップアップする
+function setupFooterActionsPopInObserver() {
+  const target = elements.resultFooterActions;
+
+  if (!target) {
+    return;
+  }
+
+  // Intersection Observer未対応環境や動きを抑えたい設定のユーザーには、最初から表示する
+  if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    target.classList.add("is-visible");
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries, observerInstance) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observerInstance.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.2, rootMargin: "0px 0px -40px 0px" }
+  );
+
+  observer.observe(target);
+}
+
+// 性格・食事の傾向・好む食べ物が、スクロールして画面内に入ったタイミングで左右からスライドインする
+function setupSlideInObserver() {
+  const targets = elements.resultContainer.querySelectorAll(".reveal-slide");
+
+  // Intersection Observer未対応環境や動きを抑えたい設定のユーザーには、最初から全部表示する
+  if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    targets.forEach((target) => target.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries, observerInstance) => {
+      // 1回のコールバックでまとめて画面内に入った要素同士だけ、その中の順番で少しずつ遅らせる
+      const enteringTargets = entries
+        .filter((entry) => entry.isIntersecting)
+        .map((entry) => entry.target)
+        .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+
+      enteringTargets.forEach((target, indexInBatch) => {
+        target.style.transitionDelay = indexInBatch * 150 + "ms";
+        target.classList.add("is-visible");
+        // 一度表示した要素は監視を止める（スクロールで往復しても再アニメーションしない）
+        observerInstance.unobserve(target);
+      });
+    },
+    { threshold: 0.2, rootMargin: "0px 0px -40px 0px" }
+  );
+
+  targets.forEach((target) => observer.observe(target));
+}
+
+// タイプ名・画像・タイプ通称のまとまりをポップインさせる
+function playResultHeroPopIn() {
+  if (!elements.resultHero || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (elements.resultHero) {
+      elements.resultHero.classList.add("is-visible");
+    }
+    return;
+  }
+
+  // 非表示状態が確実に描画されてからクラスを付けないと、ブラウザによってはポップインせず
+  // 最初から表示された状態になってしまうことがある
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      elements.resultHero.classList.add("is-visible");
+    });
+  });
 }
 
 // ------------------------------------------------------------
