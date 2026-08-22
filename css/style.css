@@ -636,17 +636,13 @@ h1, h2, p {
   transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
-.slide-in-left {
-  transform: translateX(-30px);
-}
-
-.slide-in-right {
-  transform: translateX(30px);
+.slide-in-up {
+  transform: translateY(30px);
 }
 
 .reveal-slide.is-visible {
   opacity: 1;
-  transform: translateX(0);
+  transform: translateY(0);
 }
 
 @media (prefers-reduced-motion: reduce) {
