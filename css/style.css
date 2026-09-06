@@ -285,23 +285,25 @@ h1, h2, p {
   flex-direction: column;
 }
 
-/* カード上端の余白ぶんもタイトル自身のpaddingに含め、塗りつぶしがカード端まで届くようにする */
+/* カード上端の余白ぶんもタイトル自身のpaddingに含め、塗りつぶしがカード端まで届くようにする。
+   下端は白（カード地色）へなだらかにフェードし、色の変わり目を目立たなくする */
 .app-title {
   margin: 0 0 40px;
   padding: 64px 24px 24px;
   font-size: clamp(1.5rem, 5vw, 1.9rem);
   color: var(--color-navy);
-  background-color: var(--color-primary-light);
+  background: linear-gradient(to bottom, var(--color-primary-light) 0, var(--color-primary-light) calc(100% - 20px), #ffffff 100%);
 }
 
 /* 説明文＋診断をはじめるボタンをまとめた、薄いベージュのパネル。
    カード下端の余白ぶんもパネル自身のpaddingに含め、塗りつぶしがカード端まで届くようにする。
-   flex-growで、画面が縦長のときに残るスペースも塗りつぶす */
+   flex-growで、画面が縦長のときに残るスペースも塗りつぶす。
+   上端は白（カード地色）からなだらかにフェードし、色の変わり目を目立たなくする */
 .home-cta-panel {
   flex: 1 0 auto;
   margin-top: 40px;
   padding: 32px 24px 72px;
-  background-color: var(--color-primary-light);
+  background: linear-gradient(to bottom, #ffffff 0, var(--color-primary-light) 24px, var(--color-primary-light) 100%);
 }
 
 .app-description {
@@ -321,8 +323,6 @@ h1, h2, p {
 .character-scroller {
   width: 100%;
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
 }
 
 .character-scroller + .character-scroller {
@@ -672,8 +672,12 @@ h1, h2, p {
 
 /* おすすめの日本酒セクションは、紺×金の「酒ラベル」風デザインで特別感を出す */
 /* カードの左右パディング分をマイナスマージンで打ち消し、横幅いっぱいまで塗りつぶす */
+/* 上下の端を白（カード地色）へなだらかにフェードする層を、紺のグラデーションの上に重ねる。
+   色の変わり目を目立たなくするため */
 .sake-section {
-  background: linear-gradient(135deg, var(--color-navy), var(--color-navy-light));
+  background-image:
+    linear-gradient(to bottom, #ffffff 0, rgba(255, 255, 255, 0) 14px, rgba(255, 255, 255, 0) calc(100% - 14px), #ffffff 100%),
+    linear-gradient(135deg, var(--color-navy), var(--color-navy-light));
   padding: 18px 0;
   margin-left: -20px;
   margin-right: -20px;
@@ -1100,6 +1104,14 @@ h1, h2, p {
   object-fit: cover;
   border-radius: 50%;
   border: 3px solid var(--color-gold);
+}
+
+/* タイプ一覧が1列表示になる幅のときだけ、キャラクターアイコンを75%サイズに縮小する */
+@media (max-width: 479px) {
+  .type-card-image {
+    width: 75%;
+    margin: 0 auto;
+  }
 }
 
 .type-card-nickname {
